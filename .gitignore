@@ -3,6 +3,8 @@ bin/
 obj/
 publish/
 deploy/
+deploy-standalone/
+release/
 
 # Visual Studio
 .vs/
