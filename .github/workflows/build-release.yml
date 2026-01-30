@@ -1,0 +1,81 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build self-contained executable
+      run: |
+        dotnet publish -c Release `
+          --runtime win-x64 `
+          --self-contained true `
+          -p:PublishSingleFile=true `
+          -p:IncludeNativeLibrariesForSelfExtract=true `
+          -p:EnableCompressionInSingleFile=true `
+          -o ./release
+      
+    - name: Create deployment package
+      run: |
+        New-Item -ItemType Directory -Path ./deploy -Force
+        Copy-Item -Path ./release/ScreenTimer.exe -Destination ./deploy/
+        Copy-Item -Path ./Setup-TaskScheduler.ps1 -Destination ./deploy/
+        Copy-Item -Path ./README.md -Destination ./deploy/
+        Copy-Item -Path ./DEPLOYMENT.md -Destination ./deploy/
+        
+        # Create INSTALL.txt
+        @"
+        SCREEN TIMER - DEPLOYMENT PACKAGE
+        ==================================
+        
+        This is a self-contained executable that does NOT require .NET SDK.
+        
+        Quick Start:
+        1. Copy ScreenTimer.exe to desired location
+        2. Run PowerShell as Administrator
+        3. Run: .\Setup-TaskScheduler.ps1
+        4. Configure time limits in: %LOCALAPPDATA%\screen-timer\config.txt
+        
+        For detailed instructions, see DEPLOYMENT.md
+        
+        Build: ${{ github.ref_name }}
+        Built: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+        "@ | Out-File -FilePath ./deploy/INSTALL.txt -Encoding UTF8
+        
+    - name: Create ZIP archive
+      run: |
+        Compress-Archive -Path ./deploy/* -DestinationPath ./ScreenTimer-${{ github.ref_name }}-win-x64.zip
+        
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ScreenTimer-${{ github.ref_name }}-win-x64
+        path: ./ScreenTimer-${{ github.ref_name }}-win-x64.zip
+        
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ./ScreenTimer-${{ github.ref_name }}-win-x64.zip
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
