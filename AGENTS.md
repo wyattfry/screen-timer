@@ -9,14 +9,14 @@ Screen Timer is a Windows Forms application (.NET 9.0) that tracks and limits da
 **Key characteristics:**
 - Privacy-focused: All data stored locally in `%LOCALAPPDATA%\screen-timer\`
 - Simple text-based storage: `config.txt` (7 lines, one per day) and `usage.txt` (CSV format)
-- Tamper-resistant design: No user-accessible exit controls
+- Singleton enforcement: Uses Mutex to prevent multiple instances (prevents double-counting)
+- Widget can be hidden/shown via system tray right-click menu
 - Deployed via Windows Task Scheduler for auto-start
 
 ## Directory Structure
 
 - **src/** - C# source files (Form1.cs, TimeTracker.cs, ConfigManager.cs, etc.)
 - **scripts/** - PowerShell build and setup scripts
-- **docs/** - Documentation (DEPLOYMENT.md, PROJECT_SUMMARY.md, etc.)
 - **ScreenTimer.csproj** - Project file (references src/**/*.cs)
 - **install.ps1** - Web-based installer script (root level for easy access)
 
@@ -66,11 +66,15 @@ Stop-Process -Name ScreenTimer -Force
 
 The application follows a manager-based architecture where each concern is isolated:
 
-- **src/Program.cs** - Entry point, initializes Windows Forms application
+- **src/Program.cs** - Entry point, enforces singleton using Mutex
+  - Creates named Mutex "ScreenTimer_SingleInstance_..."
+  - Shows message and exits if another instance is already running
 - **src/Form1.cs (ScreenTimerForm)** - Main orchestrator that coordinates all managers and the widget
   - Hidden form that runs in background
   - Contains main timer (60-second interval) that drives all updates
   - Handles date rollover detection and state resets
+  - Creates system tray context menu with Show/Hide timer option
+  - Prevents widget from closing (hides it instead when user clicks X)
 - **src/ConfigManager.cs** - Reads daily time limits from 7-line config file
 - **src/TimeTracker.cs** - Tracks minutes used, persists to CSV, handles date changes
 - **src/NotificationManager.cs** - Triggers popup alerts at 30, 10, 1 minute thresholds
@@ -107,6 +111,20 @@ Located at `%LOCALAPPDATA%\screen-timer\`:
   - TimeTracker reads/writes entire file on each save
 
 ## Key Implementation Details
+
+### Singleton Enforcement
+Uses a named Mutex to prevent multiple instances:
+- Mutex name: "ScreenTimer_SingleInstance_8F6F0AC4-B9A1-45fd-A8CF-72F04E6BDE8F"
+- If second instance is launched, shows message and exits immediately
+- Prevents double-counting of time usage
+- Mutex is created in src/Program.cs and held for entire application lifetime
+
+### Widget Visibility
+The time display widget can be hidden/shown but never truly closed:
+- System tray right-click menu has "Hide Timer" / "Show Timer" toggle
+- When user closes widget via X button or Alt+Tab → Close, it hides instead (FormClosing event cancels and hides)
+- Widget always exists in memory, just visibility toggled
+- This ensures timer keeps running and prevents confusion
 
 ### Timer Interval
 The main timer runs every 60 seconds (60000ms). To change:

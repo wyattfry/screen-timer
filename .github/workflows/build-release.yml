@@ -38,7 +38,6 @@ jobs:
         Copy-Item -Path ./release/ScreenTimer.exe -Destination ./deploy/
         Copy-Item -Path ./scripts/Setup-TaskScheduler.ps1 -Destination ./deploy/
         Copy-Item -Path ./README.md -Destination ./deploy/
-        
         # Create INSTALL.txt
         @"
         SCREEN TIMER - DEPLOYMENT PACKAGE
@@ -47,12 +46,13 @@ jobs:
         This is a self-contained executable that does NOT require .NET SDK.
         
         Quick Start:
-        1. Copy ScreenTimer.exe to desired location
+        1. Copy ScreenTimer.exe to desired location (e.g., C:\Program Files\ScreenTimer)
         2. Run PowerShell as Administrator
         3. Run: .\Setup-TaskScheduler.ps1
         4. Configure time limits in: %LOCALAPPDATA%\screen-timer\config.txt
         
-        For detailed instructions, see DEPLOYMENT.md
+        Or use the web installer:
+        irm https://raw.githubusercontent.com/YOUR-USERNAME/screen-timer/main/install.ps1 | iex
         
         Build: ${{ github.ref_name }}
         Built: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')

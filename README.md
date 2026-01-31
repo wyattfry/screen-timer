@@ -82,20 +82,22 @@ An always-on-top floating widget appears in the top-right corner showing:
 **Widget Features:**
 - **Draggable** - Click and drag to reposition
 - **Semi-transparent** - Becomes more visible when you hover over it
-- **Always visible** - No need to click or interact to see time
-- **No controls** - Cannot be closed or modified by user
+- **Hide/Show** - Can be hidden via system tray menu or by closing it (hides, doesn't exit)
+- **Cannot be closed permanently** - Closing the widget just hides it; app keeps running
 
 ### System Tray Icon
 
-A small icon appears in the system tray showing the app is running. It has no menu or controls to prevent tampering.
+A small icon appears in the system tray. Right-click to access:
+- **Hide Timer** / **Show Timer** - Toggle widget visibility
 
 ## How It Works
 
-1. **Display:** Always-on-top widget shows remaining time in color-coded format
-2. **Tracking:** Every minute, the app increments the usage counter for the current day
-3. **Notifications:** Popup alerts appear at 30, 10, and 1 minute remaining
-4. **Enforcement:** When time is up, the workstation locks
-5. **Reset:** At midnight, the counter resets and notifications/lock status clear
+1. **Singleton:** Uses Mutex to ensure only one instance runs (prevents double-counting time)
+2. **Display:** Always-on-top widget shows remaining time in color-coded format
+3. **Tracking:** Every minute, the app increments the usage counter for the current day
+4. **Notifications:** Popup alerts appear at 30, 10, and 1 minute remaining
+5. **Enforcement:** When time is up, the workstation locks
+6. **Reset:** At midnight, the counter resets and notifications/lock status clear
 
 ## Stopping the Application
 

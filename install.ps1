@@ -126,7 +126,19 @@ if (Test-Path $setupScript) {
     Write-Host ""
 }
 
-Write-Host "SUCCESS: Screen Timer has been installed!" -ForegroundColor Green
+Write-Host "Starting Screen Timer..." -ForegroundColor Yellow
+try {
+    Start-ScheduledTask -TaskName "ScreenTimer" -ErrorAction Stop
+    Write-Host "Screen Timer started successfully" -ForegroundColor Green
+} catch {
+    Write-Host "Warning: Could not start via Task Scheduler, trying direct launch..." -ForegroundColor Yellow
+    $exePath = Join-Path $InstallPath "ScreenTimer.exe"
+    Start-Process -FilePath $exePath
+    Write-Host "Screen Timer started" -ForegroundColor Green
+}
+
+Write-Host ""
+Write-Host "SUCCESS: Screen Timer has been installed and started!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Installation directory:" -ForegroundColor Cyan
 Write-Host "  $InstallPath" -ForegroundColor White
@@ -137,8 +149,6 @@ Write-Host ""
 Write-Host "Usage data:" -ForegroundColor Cyan
 Write-Host "  $env:LOCALAPPDATA\screen-timer\usage.txt" -ForegroundColor White
 Write-Host ""
-Write-Host "To start now:" -ForegroundColor Yellow
-Write-Host "  Start-ScheduledTask -TaskName 'ScreenTimer'" -ForegroundColor White
-Write-Host ""
 Write-Host "To configure time limits, edit the config file (7 lines, one per day Sun-Sat)" -ForegroundColor Yellow
+Write-Host "Right-click the system tray icon to hide/show the timer widget" -ForegroundColor Yellow
 Write-Host ""

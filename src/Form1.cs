@@ -34,8 +34,10 @@ public partial class ScreenTimerForm : Form
         _notifyIcon.Icon = SystemIcons.Information;
         _notifyIcon.Text = "Screen Timer - Running";
         _notifyIcon.Visible = true;
+        _notifyIcon.ContextMenuStrip = CreateContextMenu();
 
         _displayWidget = new TimeDisplayWidget();
+        _displayWidget.FormClosing += DisplayWidget_FormClosing;
         _displayWidget.Show();
 
         _timer = new System.Windows.Forms.Timer();
@@ -44,6 +46,44 @@ public partial class ScreenTimerForm : Form
         _timer.Start();
 
         UpdateDisplay();
+    }
+
+    private ContextMenuStrip CreateContextMenu()
+    {
+        var contextMenu = new ContextMenuStrip();
+        
+        var showHideItem = new ToolStripMenuItem("Hide Timer");
+        showHideItem.Click += (s, e) =>
+        {
+            if (_displayWidget.Visible)
+            {
+                _displayWidget.Hide();
+                showHideItem.Text = "Show Timer";
+            }
+            else
+            {
+                _displayWidget.Show();
+                showHideItem.Text = "Hide Timer";
+            }
+        };
+        
+        contextMenu.Items.Add(showHideItem);
+        
+        return contextMenu;
+    }
+
+    private void DisplayWidget_FormClosing(object? sender, FormClosingEventArgs e)
+    {
+        if (e.CloseReason == CloseReason.UserClosing)
+        {
+            e.Cancel = true;
+            _displayWidget.Hide();
+            
+            if (_notifyIcon.ContextMenuStrip?.Items[0] is ToolStripMenuItem menuItem)
+            {
+                menuItem.Text = "Show Timer";
+            }
+        }
     }
 
     private void ScreenTimerForm_Load(object? sender, EventArgs e)

@@ -2,13 +2,31 @@ namespace ScreenTimer;
 
 static class Program
 {
-    /// <summary>
-    ///  The main entry point for the application.
-    /// </summary>
+    private static Mutex? _mutex;
+
     [STAThread]
     static void Main()
     {
-        ApplicationConfiguration.Initialize();
-        Application.Run(new ScreenTimerForm());
+        const string mutexName = "ScreenTimer_SingleInstance_8F6F0AC4-B9A1-45fd-A8CF-72F04E6BDE8F";
+        
+        _mutex = new Mutex(true, mutexName, out bool isFirstInstance);
+        
+        if (!isFirstInstance)
+        {
+            MessageBox.Show("Screen Timer is already running.", "Already Running",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+        
+        try
+        {
+            ApplicationConfiguration.Initialize();
+            Application.Run(new ScreenTimerForm());
+        }
+        finally
+        {
+            _mutex?.ReleaseMutex();
+            _mutex?.Dispose();
+        }
     }    
 }
