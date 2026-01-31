@@ -1,7 +1,13 @@
 # Setup script for Screen Timer Task Scheduler
-# Run this script as Administrator to configure auto-start on login
+# Run this script to configure auto-start on login
 
-$exePath = Join-Path $PSScriptRoot "bin\Release\net9.0-windows\ScreenTimer.exe"
+$exePath = Join-Path $PSScriptRoot "ScreenTimer.exe"
+if (-not (Test-Path $exePath)) {
+    $exePath = Join-Path $PSScriptRoot "bin\Release\net9.0-windows\ScreenTimer.exe"
+}
+if (-not (Test-Path $exePath)) {
+    $exePath = Join-Path $PSScriptRoot "..\bin\Release\net9.0-windows\ScreenTimer.exe"
+}
 
 if (-not (Test-Path $exePath)) {
     Write-Host "ERROR: Executable not found at $exePath" -ForegroundColor Red

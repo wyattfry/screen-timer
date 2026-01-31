@@ -16,35 +16,17 @@ A simple Windows screen time limiter that tracks daily computer usage and enforc
 
 ## Installation
 
-### 1. Build the Application
+On the target machine, open PowerShell as Administrator and run:
 
 ```powershell
-dotnet publish -c Release
+irm https://raw.githubusercontent.com/wyattfry/screen-timer/main/install.ps1 | iex
 ```
 
-### 2. Set Up Auto-Start (Optional)
-
-To configure the app to start automatically at login:
-
-```powershell
-.\Setup-TaskScheduler.ps1
-```
-
-This creates a Task Scheduler task that starts Screen Timer when the user logs in.
-
-### 3. Manual Start
-
-Alternatively, you can run the app manually:
-
-```powershell
-dotnet run
-```
-
-Or run the compiled executable:
-
-```powershell
-.\bin\Release\net9.0-windows\ScreenTimer.exe
-```
+This will:
+- Download the latest release
+- Install to `C:\Program Files\ScreenTimer`
+- Configure auto-start via Task Scheduler
+- Create config files in `%LOCALAPPDATA%\screen-timer\`
 
 ## Configuration
 
@@ -131,55 +113,6 @@ Ctrl+Shift+Esc → Find ScreenTimer → End Task
 # Or via Task Scheduler
 Stop-ScheduledTask -TaskName "ScreenTimer"
 ```
-
-## Customization
-
-### Adjust Notification Thresholds
-
-Edit `NotificationManager.cs` line 16 to change when notifications appear:
-
-```csharp
-if ((minutesRemaining == 30 || minutesRemaining == 10 || minutesRemaining == 1)
-```
-
-### Change Lock Behavior
-
-Edit `LockManager.cs` to modify what happens when time is up. Options include:
-- `LockWorkStation()` - Lock the computer (current)
-- Log off the user
-- Shut down
-- Just disable without locking
-
-### Change Timer Interval
-
-Edit `Form1.cs` line 46 to change how often the app checks time (default: 60000ms = 1 minute):
-
-```csharp
-_timer.Interval = 60000;  // milliseconds
-```
-
-## Deployment to Kids' Laptops
-
-1. Build in Release mode: `dotnet publish -c Release`
-2. Copy the entire `bin\Release\net9.0-windows` folder to the target machine
-3. Run `Setup-TaskScheduler.ps1` on each laptop
-4. Edit the config file to set appropriate time limits
-5. (Optional) Set file permissions to prevent kids from editing config
-
-### Tamper Resistance
-
-For better tamper resistance:
-- Run the Task Scheduler task as SYSTEM account
-- Move config files to `C:\ProgramData\screen-timer\` 
-- Set config files as read-only for the child user account
-- Hide the system tray icon by setting `_notifyIcon.Visible = false` after initialization
-
-## Limitations
-
-- Does not track activity vs. idle time (counts all time computer is on)
-- Easy to bypass for tech-savvy users (can kill process from Task Manager)
-- No remote management or reporting
-- Windows only
 
 ## Requirements
 

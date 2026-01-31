@@ -2,6 +2,8 @@
 # This creates a single .exe file that includes the .NET runtime
 # Can run on systems without .NET SDK installed
 
+Set-Location (Join-Path $PSScriptRoot "..")
+
 Write-Host "Building self-contained Screen Timer executable..." -ForegroundColor Cyan
 Write-Host ""
 
@@ -44,6 +46,5 @@ Write-Host "WITHOUT .NET SDK installed." -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Copy ScreenTimer.exe to target computer" -ForegroundColor White
-Write-Host "  2. Run Setup-TaskScheduler.ps1 on target computer" -ForegroundColor White
-Write-Host "  3. Or run: .\create-standalone-deploy.ps1 to create deployment package" -ForegroundColor White
+Write-Host "  2. Run scripts\Setup-TaskScheduler.ps1 on target computer" -ForegroundColor White
 Write-Host ""

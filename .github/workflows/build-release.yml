@@ -36,9 +36,9 @@ jobs:
       run: |
         New-Item -ItemType Directory -Path ./deploy -Force
         Copy-Item -Path ./release/ScreenTimer.exe -Destination ./deploy/
-        Copy-Item -Path ./Setup-TaskScheduler.ps1 -Destination ./deploy/
+        Copy-Item -Path ./scripts/Setup-TaskScheduler.ps1 -Destination ./deploy/
         Copy-Item -Path ./README.md -Destination ./deploy/
-        Copy-Item -Path ./DEPLOYMENT.md -Destination ./deploy/
+        Copy-Item -Path ./docs/DEPLOYMENT.md -Destination ./deploy/
         
         # Create INSTALL.txt
         @"
