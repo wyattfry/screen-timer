@@ -9,7 +9,7 @@ Write-Host "Screen Timer Installer" -ForegroundColor Cyan
 Write-Host "=====================" -ForegroundColor Cyan
 Write-Host ""
 
-$repo = "wyatt/screen-timer"
+$repo = "wyattfry/screen-timer"
 
 if ($Version -eq "latest") {
     Write-Host "Fetching latest release information..." -ForegroundColor Yellow
