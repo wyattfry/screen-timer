@@ -20,6 +20,7 @@ if ($Version -eq "latest") {
 }
 
 try {
+    Write-Host "Trying URL $apiUrl"
     $release = Invoke-RestMethod -Uri $apiUrl -Headers @{ "User-Agent" = "ScreenTimer-Installer" }
     $downloadUrl = $release.assets | Where-Object { $_.name -like "ScreenTimer-*.zip" } | Select-Object -First 1 -ExpandProperty browser_download_url
     
